@@ -1,26 +1,36 @@
 Bill Master – Android Billing Application
+
 Overview
+
 Bill Master is a high-performance Android application designed to simplify billing for small and medium-sized businesses.
 It enables invoice generation, digital payments, and real-time data management in a lightweight, offline-capable system.
 ________________________________________
 Key Features
+
 •	Customizable Quick Add:
+
 Add, edit, or clear frequently sold products directly from the UI, stored locally for fast access
-•	Dynamic Billing System:
+  •	Dynamic Billing System:
+
 Add items via barcode scanning, manual entry, or quick-add buttons with automatic calculations
-•	PDF Invoice Generation:
+   •	PDF Invoice Generation:
+   
 Generate professional, tax-ready invoices using iText7
-•	WhatsApp Integration:
+   •	WhatsApp Integration:
 Instantly share invoices to customers without saving contacts
+
 •	Hybrid Storage:
-o	Local storage for offline access
-o	Firebase Firestore for cloud backup and sync
+  o	Local storage for offline access
+  o	Firebase Firestore for cloud backup and sync
+  
 •	Integrated Payments:
-Supports Cash, Card, NFC, and UPI QR code payments
-•	Sales Analytics:
-Track daily transactions with filtering by name and date
+   Supports Cash, Card, NFC, and UPI QR code payments
+   
+•	Sales Analytics: 
+   Track daily transactions with filtering by name and date
 ________________________________________
 Tech Stack
+
 •	Language: Java
 •	UI: Material Design 3, FlexboxLayout
 •	Backend: Firebase Firestore, Firebase Authentication
@@ -29,6 +39,7 @@ Tech Stack
 •	Security: Android FileProvider
 ________________________________________
 Setup Instructions
+
 •	Clone the repository:
 •	git clone https://github.com/yourusername/BillMaster.git
 •	Firebase Setup:
@@ -47,17 +58,21 @@ Screenshots
 
 _________________________________________
 Future Improvements
+
 •	Inventory management with stock tracking
 •	Customer loyalty and purchase history system
 •	Thermal printer integration
 ________________________________________
 Key Learnings
+
 •	Implemented authentication using Firebase
 •	Built real-time billing and data handling logic
 •	Integrated third-party libraries (PDF, QR scanning)
 •	Designed an offline-first Android application
 ________________________________________
 Contact
+
 Chandru
+
 GitHub: https://github.com/chandru2002-2
 
