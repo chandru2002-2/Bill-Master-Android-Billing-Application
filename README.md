@@ -1,45 +1,48 @@
-🧾 Bill Master – Android Billing Application
-📌 Overview
-
+Bill Master – Android Billing Application
+Overview
 Bill Master is a high-performance Android application designed to simplify billing for small and medium-sized businesses.
 It enables invoice generation, digital payments, and real-time data management in a lightweight, offline-capable system.
-
-🚀 Key Features
-Customizable Quick Add:
+________________________________________
+Key Features
+•	Customizable Quick Add:
 Add, edit, or clear frequently sold products directly from the UI, stored locally for fast access
-Dynamic Billing System:
+•	Dynamic Billing System:
 Add items via barcode scanning, manual entry, or quick-add buttons with automatic calculations
-PDF Invoice Generation:
+•	PDF Invoice Generation:
 Generate professional, tax-ready invoices using iText7
-WhatsApp Integration:
+•	WhatsApp Integration:
 Instantly share invoices to customers without saving contacts
-Hybrid Storage:
-Local storage for offline access
-Firebase Firestore for cloud backup and sync
-Integrated Payments:
+•	Hybrid Storage:
+o	Local storage for offline access
+o	Firebase Firestore for cloud backup and sync
+•	Integrated Payments:
 Supports Cash, Card, NFC, and UPI QR code payments
-Sales Analytics:
+•	Sales Analytics:
 Track daily transactions with filtering by name and date
-🛠️ Tech Stack
-Language: Java
-UI: Material Design 3, FlexboxLayout
-Backend: Firebase Firestore, Firebase Authentication
-PDF Engine: iText7
-QR/Barcode: ZXing
-Security: Android FileProvider
-🔧 Setup Instructions
+________________________________________
+Tech Stack
+•	Language: Java
+•	UI: Material Design 3, FlexboxLayout
+•	Backend: Firebase Firestore, Firebase Authentication
+•	PDF Engine: iText7
+•	QR/Barcode: ZXing
+•	Security: Android FileProvider
+________________________________________
+Setup Instructions
+•	Clone the repository:
+•	git clone https://github.com/yourusername/BillMaster.git
+•	Firebase Setup:
+1.	Add google-services.json to the app/ directory
+2.	Enable Firestore Database and Authentication (Email/Password)
+•	Permissions:
+1.	Camera (for barcode scanning)
+2.	Storage (for PDF generation on older Android versions)
+________________________________________
 
-Clone the repository:
+Screenshots
 
-git clone https://github.com/yourusername/BillMaster.git
-Firebase Setup:
-Add google-services.json to the app/ directory
-Enable Firestore Database and Authentication (Email/Password)
-Permissions:
-Camera (for barcode scanning)
-Storage (for PDF generation on older Android versions)
-📸 Screenshots
 <img width="466" height="765" alt="Screenshot 2026-03-27 234230" src="https://github.com/user-attachments/assets/e0568b12-a875-4a65-a22a-a72f385b1f65" />
+
 <img width="474" height="762" alt="Screenshot 2026-03-27 234317" src="https://github.com/user-attachments/assets/e89a3521-aed9-4d29-8a1b-362b405b209f" />
 <img width="473" height="756" alt="Screenshot 2026-03-27 234350" src="https://github.com/user-attachments/assets/6d7cbbe4-9469-49d8-85a0-2e6db83f0e9f" />
 <img width="471" height="761" alt="Screenshot 2026-03-27 235812" src="https://github.com/user-attachments/assets/2fe4bc2d-b93d-474a-bd47-36a5bad0dcb4" />
