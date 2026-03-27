@@ -21,7 +21,6 @@ import com.google.zxing.BarcodeFormat;
 import com.google.zxing.WriterException;
 import com.google.zxing.common.BitMatrix;
 import com.google.zxing.qrcode.QRCodeWriter;
-import com.itextpdf.kernel.colors.DeviceRgb;
 import com.itextpdf.kernel.pdf.PdfDocument;
 import com.itextpdf.kernel.pdf.PdfWriter;
 import com.itextpdf.layout.Document;
@@ -110,7 +109,7 @@ public class BillReviewActivity extends AppCompatActivity {
 
     private void updateUI() {
         SharedPreferences prefs = getSharedPreferences("SportsBillPrefs", MODE_PRIVATE);
-        tvShopName.setText(prefs.getString("SHOP_NAME", "SPORTS BILLING HUB"));
+        tvShopName.setText(prefs.getString("SHOP_NAME", "BILLING HUB"));
         tvCustomerDetails.setText("Name: " + customerName + "\nContact: " + customerContact);
         tvPaymentMethod.setText("Method: " + paymentMethod);
         tvTotalAmount.setText(String.format(Locale.getDefault(), "TOTAL: ₹ %.2f", totalAmount));
@@ -136,7 +135,7 @@ public class BillReviewActivity extends AppCompatActivity {
             paymentId = "CARD_" + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
             tvPaymentStatus.setText("Paid (Card)");
             enableButtons();
-        }, 3000);
+        }, 2000);
     }
 
     private void handleUpiPayment() {
@@ -152,21 +151,36 @@ public class BillReviewActivity extends AppCompatActivity {
             paymentId = "NFC_" + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
             tvPaymentStatus.setText("Paid (NFC)");
             enableButtons();
-        }, 3000);
+        }, 2000);
     }
 
     private void showUpiQrCode() {
         Dialog dialog = new Dialog(this);
-        dialog.setContentView(R.layout.dialog_qr_code);
+        // Updated to your specific layout filename
+        dialog.setContentView(R.layout.btn_qr_cancel);
+
         ImageView ivQr = dialog.findViewById(R.id.iv_qr_code);
+        TextView tvQrAmount = dialog.findViewById(R.id.tv_qr_amount);
         MaterialButton btnPaid = dialog.findViewById(R.id.btn_qr_paid);
+        MaterialButton btnCancel = dialog.findViewById(R.id.btn_qr_cancel);
 
         SharedPreferences prefs = getSharedPreferences("SportsBillPrefs", MODE_PRIVATE);
         String merchantUpi = prefs.getString("SHOP_UPI", "merchant@upi");
+        String shopName = prefs.getString("SHOP_NAME", "Shop");
 
         try {
-            String upi = "upi://pay?pa=" + merchantUpi + "&pn=Shop&am=" + totalAmount + "&cu=INR";
+            // FIX: Strict formatting ensures amount is never 0.00 if totalAmount is present
+            String formattedAmount = String.format(Locale.US, "%.2f", totalAmount);
+
+            if (tvQrAmount != null) {
+                tvQrAmount.setText("Amount: ₹ " + formattedAmount);
+            }
+
+            String shopNameEncoded = shopName.replace(" ", "%20");
+            String upi = "upi://pay?pa=" + merchantUpi + "&pn=" + shopNameEncoded + "&am=" + formattedAmount + "&cu=INR";
+
             ivQr.setImageBitmap(generateQRCode(upi, 512, 512));
+
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -178,6 +192,11 @@ public class BillReviewActivity extends AppCompatActivity {
             enableButtons();
         });
 
+        // Handle Cancel Button Logic
+        if (btnCancel != null) {
+            btnCancel.setOnClickListener(v -> dialog.dismiss());
+        }
+
         dialog.show();
     }
 
@@ -185,15 +204,10 @@ public class BillReviewActivity extends AppCompatActivity {
         File dir = getExternalFilesDir("Bills");
         if (dir == null || (!dir.exists() && !dir.mkdirs())) return null;
 
-        // Standardize Name for Filename
         String cleanName = (customerName != null && !customerName.trim().isEmpty())
-                ? customerName.trim().replaceAll("\\s+", "_")
-                : "Unknown";
+                ? customerName.trim().replaceAll("\\s+", "_") : "Unknown";
 
-        // Format amount for filename to avoid "long digit" issues in local storage
         String formattedAmount = String.format(Locale.US, "%.2f", totalAmount);
-
-        // Standard Filename Structure: Bill_Name_Amount_Timestamp.pdf
         String fileName = "Bill_" + cleanName + "_" + formattedAmount + "_" + System.currentTimeMillis() + ".pdf";
         File file = new File(dir, fileName);
 
@@ -204,10 +218,9 @@ public class BillReviewActivity extends AppCompatActivity {
             PdfDocument pdf = new PdfDocument(writer);
             Document document = new Document(pdf);
 
-            String shop = prefs.getString("SHOP_NAME", "SPORTS BILLING HUB");
+            String shop = prefs.getString("SHOP_NAME", "BILLING HUB");
             String gst = prefs.getString("SHOP_GST", "N/A");
 
-            // Header
             document.add(new Paragraph(shop).setBold().setFontSize(20).setTextAlignment(TextAlignment.CENTER));
             document.add(new Paragraph("GSTIN: " + gst).setFontSize(10).setTextAlignment(TextAlignment.CENTER));
             document.add(new Paragraph("Tax Invoice").setBold().setTextAlignment(TextAlignment.CENTER));
@@ -216,7 +229,6 @@ public class BillReviewActivity extends AppCompatActivity {
             document.add(new Paragraph("\nCustomer: " + customerName).setBold());
             document.add(new Paragraph("Contact: " + customerContact).setFontSize(10));
 
-            // Items Table
             Table table = new Table(UnitValue.createPercentArray(new float[]{1, 5, 2, 2})).useAllAvailableWidth();
             table.addHeaderCell(new Cell().add(new Paragraph("S.No").setBold()));
             table.addHeaderCell(new Cell().add(new Paragraph("Item").setBold()));
@@ -236,7 +248,6 @@ public class BillReviewActivity extends AppCompatActivity {
             document.add(new Paragraph("Payment: " + paymentMethod + " | ID: " + paymentId).setFontSize(9));
 
             document.close();
-            Toast.makeText(this, "Bill Saved Locally", Toast.LENGTH_SHORT).show();
             return file;
 
         } catch (Exception e) {
@@ -250,53 +261,46 @@ public class BillReviewActivity extends AppCompatActivity {
         if (uid == null) return;
 
         BillData cloudData = new BillData(customerName, totalAmount, billItemsList);
-
         db.collection("users").document(uid).collection("bills")
                 .add(cloudData)
-                .addOnSuccessListener(documentReference -> {
+                .addOnSuccessListener(ref -> {
                     Toast.makeText(this, "Synced to Cloud", Toast.LENGTH_SHORT).show();
                     btnSaveBill.setEnabled(false);
                 })
                 .addOnFailureListener(e -> Toast.makeText(this, "Sync Failed", Toast.LENGTH_SHORT).show());
     }
 
-    // ... inside BillReviewActivity.java ...
-
     private void sendBill(File file) {
         if (customerContact == null || customerContact.trim().isEmpty()) {
-            // Fallback to generic share if no number is provided
             shareGeneric(file);
             return;
         }
 
-        // 1. Clean the phone number (Keep only digits)
         String cleanNumber = customerContact.replaceAll("[^0-9]", "");
-
-        // 2. Ensure it has a country code (Prefix '91' for India if it's a 10-digit number)
-        if (cleanNumber.length() == 10) {
-            cleanNumber = "91" + cleanNumber;
-        }
+        if (cleanNumber.length() == 10) cleanNumber = "91" + cleanNumber;
 
         try {
             Uri uri = FileProvider.getUriForFile(this, getPackageName() + ".provider", file);
-
-            // 3. Create Intent specifically for WhatsApp
             Intent intent = new Intent(Intent.ACTION_SEND);
             intent.setType("application/pdf");
             intent.putExtra(Intent.EXTRA_STREAM, uri);
-
-            // This specific "jid" extra tells WhatsApp which contact to open automatically
-            // Format: [country_code][number]@s.whatsapp.net
             intent.putExtra("jid", cleanNumber + "@s.whatsapp.net");
-            intent.setPackage("com.whatsapp"); // Forces WhatsApp to open directly
-
+            intent.setPackage("com.whatsapp"); // Try standard WhatsApp
             intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
             startActivity(intent);
-
         } catch (Exception e) {
-            // If WhatsApp is not installed, fallback to generic share
-            Toast.makeText(this, "WhatsApp not installed. Using standard share.", Toast.LENGTH_SHORT).show();
-            shareGeneric(file);
+            try {
+                // Try WhatsApp Business fallback
+                Uri uri = FileProvider.getUriForFile(this, getPackageName() + ".provider", file);
+                Intent w4b = new Intent(Intent.ACTION_SEND);
+                w4b.setType("application/pdf");
+                w4b.putExtra(Intent.EXTRA_STREAM, uri);
+                w4b.setPackage("com.whatsapp.w4b");
+                w4b.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                startActivity(w4b);
+            } catch (Exception e2) {
+                shareGeneric(file);
+            }
         }
     }
 
@@ -333,21 +337,16 @@ public class BillReviewActivity extends AppCompatActivity {
     private static class BillItemsAdapter extends RecyclerView.Adapter<BillItemsAdapter.ViewHolder> {
         private List<BillEntry.BillItem> list;
         BillItemsAdapter(List<BillEntry.BillItem> list) { this.list = list; }
-
-        @NonNull
-        public ViewHolder onCreateViewHolder(@NonNull ViewGroup p, int v) {
+        @NonNull public ViewHolder onCreateViewHolder(@NonNull ViewGroup p, int v) {
             return new ViewHolder(LayoutInflater.from(p.getContext()).inflate(R.layout.item_bill_review, p, false));
         }
-
         public void onBindViewHolder(@NonNull ViewHolder h, int pos) {
             BillEntry.BillItem item = list.get(pos);
             h.name.setText(item.getName());
             h.qty.setText("Qty: " + item.getQuantity());
             h.price.setText(String.format("₹ %.2f", item.getTotal()));
         }
-
         public int getItemCount() { return list != null ? list.size() : 0; }
-
         static class ViewHolder extends RecyclerView.ViewHolder {
             TextView name, qty, price;
             ViewHolder(View v) {
@@ -359,13 +358,11 @@ public class BillReviewActivity extends AppCompatActivity {
         }
     }
 
-    // Cloud Data Model (Matches PreviousBillsActivity)
     public static class BillData implements Serializable {
         public String customerName;
         public double amount;
         public Date timestamp;
         public List<BillEntry.BillItem> items;
-
         public BillData() {}
         public BillData(String name, double amt, List<BillEntry.BillItem> items) {
             this.customerName = name;
