@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "289321104730",
+    "project_id": "sportsbillgenerator",
+    "storage_bucket": "sportsbillgenerator.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:289321104730:android:f42f3e245592720c972f63",
+        "android_client_info": {
+          "package_name": "com.example.sportsbill"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCbqUiNlqOC5EU1SwOoJA7t5EDM8O6Zxmk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

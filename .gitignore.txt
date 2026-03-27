@@ -1,0 +1,30 @@
+# Android / Gradle Build Folders
+.gradle/
+build/
+app/build/
+captures/
+.externalNativeBuild/
+.cxx/
+local.properties
+
+# Secrets (Important!)
+# This prevents your Firebase/Google API keys from being stolen
+google-services.json
+*.jks
+*.keystore
+
+# IDE / Project Files
+.idea/
+*.iml
+.navigation/
+captures/
+
+# OS / Logs
+.DS_Store
+Thumbs.db
+*.log
+
+# Generated outputs
+*.apk
+*.aab
+*.ap_
